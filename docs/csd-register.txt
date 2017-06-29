@@ -1,0 +1,35 @@
+FROM TOSHIBA SD-M04G7B7 PSD
+
+                                                    |     Initial Value
+Field 			| Width | Cell Type(1) | CSD slice  |    4GB    |    8GB
+CSD_STRUCTURE 		2	 	R 			[127:126] 		       01
+- 					6 		R 			[125:120]              All ‘0’
+TAAC 				8 		R 			[119:112]           0_0001_110(1ms)
+NSAC 				8 		R 			[111:104]               00000000
+TRAN_SPEED 			8 		R 			[103:96]            0_0110_010(25Mbps)
+CCC 				12 		R 			[95:84]            0_1_0_1_1_0_1_1_0_1_0_1
+READ_BL_LEN 		4 		R 			[83:80]     | 1001      |   1001
+READ_BL_PARTIAL 	1 		R 			[79:79]         0
+WRITE_BLK_MISALIGN 	1 		R 			[78:78]         0
+READ_BLK_MISALIGN 	1 		R 			[77:77]         0
+DSR_IMP 			1 		R 			[76:76]         0
+- 					6 		R 			[75:70]         All ‘0’
+C_SIZE 				22 		R 			[69:48]         0x1DFF 0x3BFF
+- 					1 		R 			[47:47]         0
+ERASE_BLK_EN 		1 		R 			[46:46]         1
+SECTOR_SIZE 		7 		R 			[45:39]         11_1111_1
+WP_GRP_SIZE 		7 		R 			[38:32]         000_0000
+WP_GRP_ENABLE 		1 		R 			[31:31]         0
+- 					2 		R 			[30:29]         00
+R2W_FACTOR 			3 		R 			[28:26]         010
+WRITE_BL_LEN 		4 		R 			[25:22]         1001
+WRITE_BL_PARTIAL 	1 		R 			[21:21]         0
+- 					2 		R 			[20:16]         All ‘0’
+FILE_FORMAT_GRP 	1 		R 			[15:15]         0
+COPY 				1 		R/W(1) 		[14:14]         0
+PERM_WRITE_PROTECT 	1 		R/W(1) 		[13:13]         0
+TMP_WRITE_PROTECT 	1 		R/W 		[12:12]         0
+FILE_FORMAT 		2 		R 			[11:10]         00
+- 					2 		R 			[9:8]           All ‘0’
+CRC 				7 		R/W 		[7:1]           (CRC)
+- 					1 		- 			[0:0]           1
