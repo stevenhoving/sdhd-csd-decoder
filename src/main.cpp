@@ -294,13 +294,65 @@ static int mmc_decode_scr(std::vector<uint32_t> raw_scr)
     return 0;
 }
 
+/*
+https://en.wikipedia.org/wiki/List_of_flash_memory_controller_manufacturers
+
+(1) from from http://www.mydigit.cn/simple/?t405871.html
+(2) from https://www.embeddedrelated.com/showthread/lpc2000/28381-1.php
+(3) from https://wiki.linaro.org/WorkingGroups/KernelArchived/Projects/FlashCardSurvey?action=show&redirect=WorkingGroups%2FKernel%2FProjects%2FFlashCardSurvey
+(4) from http://elinux.org/RPi_SD_cards
+*/
+std::map<std::string, std::string> oemid_names = {
+    // (sure/pretty sure)
+    {"TM", "Toshiba Memory"},
+    {"J`", "JMicron"},
+    {"SD", "SanDisk"},
+    {"SM", "Samsung"},
+    {"PA", "Panasonic"},
+
+    // (unsure/no freaking idea)
+    {"KG",      "KingMax"},     // (1)
+    {"\3\3",    "AData/NCard"}, // (1)
+    {"AD",      "AData"},       // (1)
+    {"IN",      "Unknown"},     // (2) Lexar cards
+    {"\0\0",    "Unknown"},     // (3) Bestmedia cards (probebly fake)
+    {"  ",      "Fake"},        // (3)
+    {"42",      "Fake"},        // (3) Fake Kingston
+    {"\255\255","Unknown"},     // (3) Wintec cards
+    {"AB",      "Unknown"},     // (3)
+    {"AP",      "Unknown"},     // (3) Lexar cards
+    {"BE",      "Unknown"},     // (3) Lexar cards
+    {"H-",      "Unknown"},     // (3)
+    {"HS",      "Unknown"},     // (3)
+    {"JE",      "Unknown"},     // (3)
+    {"PH",      "Phison"},      // (3)
+    {"PQ",      "Unknown"},     // (3)
+    {"SV",      "Unknown"},     // (3)
+};
+
+std::string get_oemid_name(unsigned int oemid)
+{
+    char oemid_four[3] = {};
+    oemid_four[0] = (oemid >> 8) & 0xff;
+    oemid_four[1] = (oemid >> 0) & 0xff;
+
+    auto oem_name = oemid_names[oemid_four];
+    if (oem_name.empty())
+        oem_name = "Unknown";
+    return oem_name + ", '" + oemid_four + "'";
+}
+
 void mmc_decode_cid(std::vector<uint32_t> raw_scr)
 {
     uint32_t *resp = raw_scr.data();
 
     printf("## CID ##\n");
     printf("manfid:                         0x%X\n", unstuff_bits(resp, 120, 8));
-    printf("oemid:                          0x%X\n", unstuff_bits(resp, 104, 16));
+
+    auto oemid = unstuff_bits(resp, 104, 16);
+    auto oem_name = get_oemid_name(oemid);
+
+    printf("oemid:                          0x%X (%s)\n", oemid, oem_name.c_str());
     printf("prod_name[0]:                   0x%X (%c)\n", unstuff_bits(resp,  96, 8), unstuff_bits(resp,  96, 8));
     printf("prod_name[1]:                   0x%X (%c)\n", unstuff_bits(resp,  88, 8), unstuff_bits(resp,  88, 8));
     printf("prod_name[2]:                   0x%X (%c)\n", unstuff_bits(resp,  80, 8), unstuff_bits(resp,  80, 8));
